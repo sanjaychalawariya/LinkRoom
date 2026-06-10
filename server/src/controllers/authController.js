@@ -2,13 +2,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// Generate JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "30d",
-  });
-};
-
 const signup = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
@@ -53,27 +46,43 @@ const login = async (req, res, next) => {
 
     if (!email || !password) {
       res.status(400);
-      throw new Error("Please enter email and password");
+      throw new Error("Email and password are required");
     }
 
-    // Check for user email
     const user = await User.findOne({ email });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      res.json({
-        success: true,
-        message: "User logged in successfully",
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email
-        },
-        token: generateToken(user._id)
-      });
-    } else {
+    if (!user) {
       res.status(401);
       throw new Error("Invalid email or password");
     }
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatch) {
+      res.status(401);
+      throw new Error("Invalid email or password");
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d"
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email
+      }
+    });
   } catch (error) {
     next(error);
   }
