@@ -46,6 +46,50 @@ const createRoom = async (req, res, next) => {
   }
 };
 
+// @desc    Join an existing chat room by roomCode
+// @route   POST /api/rooms/join
+// @access  Private
+const joinRoom = async (req, res, next) => {
+  try {
+    const { roomCode } = req.body;
+
+    if (!roomCode) {
+      res.status(400);
+      throw new Error('Room code is required');
+    }
+
+    // Find the room by roomCode
+    const room = await Room.findOne({ roomCode });
+
+    if (!room) {
+      res.status(404);
+      throw new Error('Room not found');
+    }
+
+    // Add user to participants if not already present
+    if (!room.participants.includes(req.user._id)) {
+      room.participants.push(req.user._id);
+      await room.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Joined room successfully',
+      room: {
+        id: room._id,
+        roomName: room.roomName,
+        roomCode: room.roomCode,
+        owner: room.owner,
+        participants: room.participants,
+        createdAt: room.createdAt,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createRoom,
+  joinRoom,
 };
