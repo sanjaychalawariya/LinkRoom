@@ -88,7 +88,28 @@ const login = async (req, res, next) => {
   }
 };
 
+const getMe = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      res.status(401);
+      throw new Error("Not authorized, user not found");
+    }
+
+    res.status(200).json({
+      success: true,
+      user: {
+        id: req.user._id,
+        username: req.user.username,
+        email: req.user.email
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   signup,
-  login
+  login,
+  getMe
 };
