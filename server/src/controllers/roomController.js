@@ -89,7 +89,54 @@ const joinRoom = async (req, res, next) => {
   }
 };
 
+// @desc    Get room details by roomCode
+// @route   GET /api/rooms/:roomCode
+// @access  Private
+const getRoomDetails = async (req, res, next) => {
+  try {
+    const { roomCode } = req.params;
+
+    if (!roomCode) {
+      res.status(400);
+      throw new Error('Room code is required');
+    }
+
+    // Find the room and populate owner & participants
+    const room = await Room.findOne({ roomCode })
+      .populate('owner', 'username email avatar')
+      .populate('participants', 'username email avatar');
+
+    if (!room) {
+      res.status(404);
+      throw new Error('Room not found');
+    }
+
+    // Check authorization: User must be a participant of the room
+    const isParticipant = room.participants.some(
+      (p) => p._id.toString() === req.user._id.toString()
+    );
+
+    if (!isParticipant) {
+      res.status(403);
+      throw new Error('Not authorized to access this room');
+    }
+
+    res.status(200).json({
+      success: true,
+      room: {
+        roomName: room.roomName,
+        roomCode: room.roomCode,
+        owner: room.owner,
+        participants: room.participants,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createRoom,
   joinRoom,
+  getRoomDetails,
 };
