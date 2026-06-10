@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const messageRoutes = require("./routes/messageRoutes");
+const authRoutes = require("./routes/authRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Chat API running" });
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
 app.use(notFound);
