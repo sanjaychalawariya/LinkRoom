@@ -1,19 +1,24 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
+const messageRoutes = require("./routes/messageRoutes");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
 
-// Base route
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to LinkRoom API' });
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.json({ message: "Chat API running" });
 });
 
-// Import and use routes here later
-// app.use('/api/auth', authRoutes);
+app.use("/api/messages", messageRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;
