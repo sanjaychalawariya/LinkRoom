@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
-      required: [true, 'Please add a name'],
+      required: [true, 'Please add a username'],
+      unique: true,
+      trim: true,
     },
     email: {
       type: String,
@@ -20,27 +21,12 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png', // Default avatar
+      default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
     },
   },
   {
     timestamps: true,
   }
 );
-
-// Match user entered password to hashed password in database
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
-
-// Encrypt password using bcrypt
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    next();
-  }
-
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
 
 module.exports = mongoose.model('User', userSchema);
