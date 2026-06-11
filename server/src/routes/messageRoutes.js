@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { saveMessage, getMessagesByRoom } = require('../controllers/messageController');
+const { protect } = require('../middleware/authMiddleware');
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Message API routes placeholder' });
-});
+router.post('/', protect, saveMessage);
+router.get('/:roomId', protect, getMessagesByRoom);
 
 module.exports = router;

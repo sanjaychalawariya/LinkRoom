@@ -130,6 +130,7 @@ const getRoomDetails = async (req, res, next) => {
     res.status(200).json({
       success: true,
       room: {
+        id: room._id,
         roomName: room.roomName,
         roomCode: room.roomCode,
         owner: room.owner,

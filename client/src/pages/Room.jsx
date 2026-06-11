@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import io from 'socket.io-client';
+import { socket } from '../socket';
+import { API_BASE_URL } from '../api';
 
 const Room = () => {
   const { roomId } = useParams(); // Can be roomId or roomCode
@@ -15,16 +16,15 @@ const Room = () => {
   // Chat states
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [socket, setSocket] = useState(null);
 
   // Copy status
   const [copied, setCopied] = useState(false);
 
-  const messagesEndRef = useRef(null);
+  const chatBottomRef = useRef(null);
 
   // Auto scroll to bottom
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -46,13 +46,35 @@ const Room = () => {
       setCurrentUser(parsedUser);
 
       try {
-        const response = await axios.get(`http://localhost:5000/api/rooms/${roomId}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/rooms/${roomId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        setRoom(response.data.room);
+        const roomData = response.data.room;
+        setRoom(roomData);
+
+        // Fetch messages history
+        try {
+          const messagesResponse = await axios.get(`${API_BASE_URL}/api/messages/${roomData.id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const formattedMessages = messagesResponse.data.messages.map((msg) => ({
+            _id: msg._id,
+            content: msg.text,
+            sender: {
+              id: msg.sender._id,
+              username: msg.sender.username,
+            },
+            createdAt: msg.createdAt,
+          }));
+          setMessages(formattedMessages);
+        } catch (msgErr) {
+          console.error('Failed to fetch messages history:', msgErr);
+        }
       } catch (err) {
         console.error(err);
         setError(err.response?.data?.message || 'Failed to load room details.');
@@ -69,27 +91,26 @@ const Room = () => {
     if (!room || !currentUser) return;
 
     // Connect to backend server socket
-    const newSocket = io('http://localhost:5000');
-    setSocket(newSocket);
+    socket.connect();
 
     // Join room
-    newSocket.emit('join_room', {
+    socket.emit('join_room', {
       roomId: room.id,
       user: { id: currentUser.id, username: currentUser.username },
     });
 
     // Listen for incoming messages
-    newSocket.on('receive_message', (message) => {
+    socket.on('receive_message', (message) => {
       setMessages((prev) => [...prev, message]);
     });
 
     // Listen for presence events
-    newSocket.on('user_joined', ({ user, message }) => {
+    socket.on('user_joined', ({ user, message }) => {
       setMessages((prev) => [
         ...prev,
         {
           _id: Math.random().toString(),
-          text: message,
+          content: message,
           system: true,
           createdAt: new Date(),
         },
@@ -107,12 +128,12 @@ const Room = () => {
       });
     });
 
-    newSocket.on('user_left', ({ user, message }) => {
+    socket.on('user_left', ({ user, message }) => {
       setMessages((prev) => [
         ...prev,
         {
           _id: Math.random().toString(),
-          text: message,
+          content: message,
           system: true,
           createdAt: new Date(),
         },
@@ -130,11 +151,15 @@ const Room = () => {
 
     // Clean up on unmount
     return () => {
-      newSocket.emit('leave_room', {
+      socket.emit('leave_room', {
         roomId: room.id,
         user: { id: currentUser.id, username: currentUser.username },
       });
-      newSocket.disconnect();
+      // Remove listeners and disconnect
+      socket.off('receive_message');
+      socket.off('user_joined');
+      socket.off('user_left');
+      socket.disconnect();
     };
   }, [room?.id, currentUser]);
 
@@ -145,7 +170,7 @@ const Room = () => {
     // Emit message to Socket Server
     socket.emit('send_message', {
       roomId: room.id,
-      text: newMessage,
+      content: newMessage,
       sender: {
         id: currentUser.id,
         username: currentUser.username,
@@ -287,7 +312,7 @@ const Room = () => {
                 return (
                   <div key={message._id} className="flex justify-center my-2">
                     <span className="bg-white/5 border border-white/5 text-gray-400 text-[11px] font-semibold px-3 py-1 rounded-full tracking-wide">
-                      {message.text}
+                      {message.content}
                     </span>
                   </div>
                 );
@@ -321,7 +346,7 @@ const Room = () => {
                           : 'bg-[#151221] border border-white/5 text-gray-200 rounded-bl-none'
                       }`}
                     >
-                      <p className="whitespace-pre-wrap">{message.text}</p>
+                      <p className="whitespace-pre-wrap">{message.content}</p>
                     </div>
 
                     {/* Timestamp */}
@@ -333,7 +358,7 @@ const Room = () => {
               );
             })
           )}
-          <div ref={messagesEndRef} />
+          <div ref={chatBottomRef} />
         </div>
 
         {/* Chat Footer Input */}

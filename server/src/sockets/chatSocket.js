@@ -23,19 +23,19 @@ const chatSocket = (io) => {
     });
 
     // User sends a message
-    socket.on('send_message', async ({ roomId, text, sender }) => {
+    socket.on('send_message', async ({ roomId, content, sender }) => {
       try {
         // Save the message to the database directly using roomId
         const message = await Message.create({
           sender: sender.id,
           room: roomId,
-          text: text,
+          text: content,
         });
 
         // Prepare payload to broadcast
         const messageData = {
           _id: message._id,
-          text: message.text,
+          content: message.text,
           sender: {
             id: sender.id,
             username: sender.username,

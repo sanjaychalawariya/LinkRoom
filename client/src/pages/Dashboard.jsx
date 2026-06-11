@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../api';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -27,7 +28,7 @@ const Dashboard = () => {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/auth/me', {
+        const response = await axios.get(`${API_BASE_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -65,7 +66,7 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/rooms/create',
+        `${API_BASE_URL}/api/rooms/create`,
         { roomName: newRoomName },
         {
           headers: {
@@ -101,7 +102,7 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/rooms/join',
+        `${API_BASE_URL}/api/rooms/join`,
         { roomCode: joinRoomCode.toUpperCase() },
         {
           headers: {
