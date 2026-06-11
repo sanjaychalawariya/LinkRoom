@@ -11,59 +11,52 @@ const chatSocket = (io) => {
     console.log(`User connected: ${socket.id}`);
 
     // User joins a room
-    socket.on('join_room', ({ roomCode, user }) => {
-      socket.join(roomCode);
-      console.log(`User ${user.username} (${socket.id}) joined room: ${roomCode}`);
+    socket.on('join_room', ({ roomId, user }) => {
+      socket.join(roomId);
+      console.log(`User ${user.username} (${socket.id}) joined room: ${roomId}`);
 
       // Notify other participants in the room
-      socket.to(roomCode).emit('user_joined', {
+      socket.to(roomId).emit('user_joined', {
         user,
         message: `${user.username} has joined the chat.`,
       });
     });
 
     // User sends a message
-    socket.on('send_message', async ({ roomCode, text, sender }) => {
+    socket.on('send_message', async ({ roomId, text, sender }) => {
       try {
-        // Find room by roomCode to obtain its ObjectId
-        const room = await Room.findOne({ roomCode });
+        // Save the message to the database directly using roomId
+        const message = await Message.create({
+          sender: sender.id,
+          room: roomId,
+          text: text,
+        });
 
-        if (room) {
-          // Save the message to the database
-          const message = await Message.create({
-            sender: sender.id,
-            room: room._id,
-            text: text,
-          });
+        // Prepare payload to broadcast
+        const messageData = {
+          _id: message._id,
+          text: message.text,
+          sender: {
+            id: sender.id,
+            username: sender.username,
+          },
+          createdAt: message.createdAt,
+        };
 
-          // Prepare payload to broadcast
-          const messageData = {
-            _id: message._id,
-            text: message.text,
-            sender: {
-              id: sender.id,
-              username: sender.username,
-            },
-            createdAt: message.createdAt,
-          };
-
-          // Broadcast message ONLY to clients inside that room
-          io.to(roomCode).emit('receive_message', messageData);
-        } else {
-          console.error(`Socket Error: Room not found for code ${roomCode}`);
-        }
+        // Broadcast message ONLY to clients inside that room
+        io.to(roomId).emit('receive_message', messageData);
       } catch (error) {
         console.error('Socket error saving message:', error.message);
       }
     });
 
     // User leaves a room
-    socket.on('leave_room', ({ roomCode, user }) => {
-      socket.leave(roomCode);
-      console.log(`User ${user.username} (${socket.id}) left room: ${roomCode}`);
+    socket.on('leave_room', ({ roomId, user }) => {
+      socket.leave(roomId);
+      console.log(`User ${user.username} (${socket.id}) left room: ${roomId}`);
 
       // Notify others in the room
-      socket.to(roomCode).emit('user_left', {
+      socket.to(roomId).emit('user_left', {
         user,
         message: `${user.username} has left the chat.`,
       });

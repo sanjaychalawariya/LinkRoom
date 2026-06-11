@@ -74,7 +74,7 @@ const Room = () => {
 
     // Join room
     newSocket.emit('join_room', {
-      roomCode: room.roomCode,
+      roomId: room.id,
       user: { id: currentUser.id, username: currentUser.username },
     });
 
@@ -131,12 +131,12 @@ const Room = () => {
     // Clean up on unmount
     return () => {
       newSocket.emit('leave_room', {
-        roomCode: room.roomCode,
+        roomId: room.id,
         user: { id: currentUser.id, username: currentUser.username },
       });
       newSocket.disconnect();
     };
-  }, [room?.roomCode, currentUser]);
+  }, [room?.id, currentUser]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -144,7 +144,7 @@ const Room = () => {
 
     // Emit message to Socket Server
     socket.emit('send_message', {
-      roomCode: room.roomCode,
+      roomId: room.id,
       text: newMessage,
       sender: {
         id: currentUser.id,
