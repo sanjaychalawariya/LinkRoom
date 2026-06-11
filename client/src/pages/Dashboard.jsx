@@ -78,7 +78,7 @@ const Dashboard = () => {
       setCreateSuccess(`Room "${createdRoom.roomName}" created! Code: ${createdRoom.roomCode}`);
       setNewRoomName('');
       setTimeout(() => {
-        navigate(`/room/${createdRoom.roomCode}`);
+        navigate(`/room/${createdRoom.id}`);
       }, 1000);
     } catch (err) {
       setCreateError(err.response?.data?.message || 'Failed to create room.');
@@ -114,7 +114,7 @@ const Dashboard = () => {
       setJoinSuccess(`Successfully joined room "${joinedRoom.roomName}"!`);
       setJoinRoomCode('');
       setTimeout(() => {
-        navigate(`/room/${joinedRoom.roomCode}`);
+        navigate(`/room/${joinedRoom.id}`);
       }, 1000);
     } catch (err) {
       setJoinError(err.response?.data?.message || 'Failed to join room.');
