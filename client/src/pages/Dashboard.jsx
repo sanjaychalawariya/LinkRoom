@@ -8,6 +8,16 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  // Create/Join states
+  const [newRoomName, setNewRoomName] = useState('');
+  const [joinRoomCode, setJoinRoomCode] = useState('');
+  const [createSuccess, setCreateSuccess] = useState('');
+  const [createError, setCreateError] = useState('');
+  const [joinSuccess, setJoinSuccess] = useState('');
+  const [joinError, setJoinError] = useState('');
+  const [createLoading, setCreateLoading] = useState(false);
+  const [joinLoading, setJoinLoading] = useState(false);
+
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem('token');
@@ -40,6 +50,72 @@ const Dashboard = () => {
 
     fetchUser();
   }, [navigate]);
+
+  const handleCreateRoom = async (e) => {
+    e.preventDefault();
+    if (!newRoomName.trim()) {
+      setCreateError('Room name cannot be empty');
+      return;
+    }
+
+    setCreateLoading(true);
+    setCreateError('');
+    setCreateSuccess('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        'http://localhost:5000/api/rooms/create',
+        { roomName: newRoomName },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const createdRoom = response.data.room;
+      setCreateSuccess(`Room "${createdRoom.roomName}" created! Code: ${createdRoom.roomCode}`);
+      setNewRoomName('');
+    } catch (err) {
+      setCreateError(err.response?.data?.message || 'Failed to create room.');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  const handleJoinRoom = async (e) => {
+    e.preventDefault();
+    if (!joinRoomCode.trim()) {
+      setJoinError('Room code cannot be empty');
+      return;
+    }
+
+    setJoinLoading(true);
+    setJoinError('');
+    setJoinSuccess('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        'http://localhost:5000/api/rooms/join',
+        { roomCode: joinRoomCode.toUpperCase() },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const joinedRoom = response.data.room;
+      setJoinSuccess(`Successfully joined room "${joinedRoom.roomName}"!`);
+      setJoinRoomCode('');
+    } catch (err) {
+      setJoinError(err.response?.data?.message || 'Failed to join room.');
+    } finally {
+      setJoinLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -83,48 +159,94 @@ const Dashboard = () => {
         {/* Dashboard Grid */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Create Room Card */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-xl hover:border-violet-500/30 transition-all duration-300 group">
-            <div className="w-12 h-12 bg-violet-600/10 border border-violet-500/20 text-violet-400 flex items-center justify-center rounded-xl mb-6 group-hover:scale-110 transition-transform duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-xl hover:border-violet-500/30 transition-all duration-300 group flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 bg-violet-600/10 border border-violet-500/20 text-violet-400 flex items-center justify-center rounded-xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-left">Create a New Room</h3>
+              <p className="text-gray-400 text-sm mb-6 text-left leading-relaxed">
+                Start a new chat room, get a unique room ID, and invite your team members.
+              </p>
             </div>
-            <h3 className="text-xl font-bold mb-2 text-left">Create a New Room</h3>
-            <p className="text-gray-400 text-sm mb-6 text-left leading-relaxed">
-              Start a new chat room, get a unique room ID, and invite your team members.
-            </p>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                placeholder="Enter room name..."
-                className="flex-1 bg-[#13111A] text-white placeholder-gray-500 border border-white/10 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all"
-              />
-              <button className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95">
-                Create
-              </button>
+            <div>
+              {createError && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-2.5 rounded-lg mb-4 text-center">
+                  {createError}
+                </div>
+              )}
+              {createSuccess && (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs p-2.5 rounded-lg mb-4 text-center font-medium">
+                  {createSuccess}
+                </div>
+              )}
+              <form onSubmit={handleCreateRoom} className="flex gap-3">
+                <input
+                  type="text"
+                  placeholder="Enter room name..."
+                  value={newRoomName}
+                  onChange={(e) => {
+                    setNewRoomName(e.target.value);
+                    if (createError) setCreateError('');
+                  }}
+                  className="flex-1 bg-[#13111A] text-white placeholder-gray-500 border border-white/10 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all"
+                />
+                <button
+                  type="submit"
+                  disabled={createLoading}
+                  className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  {createLoading ? 'Creating...' : 'Create'}
+                </button>
+              </form>
             </div>
           </div>
 
           {/* Join Room Card */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-xl hover:border-indigo-500/30 transition-all duration-300 group">
-            <div className="w-12 h-12 bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center rounded-xl mb-6 group-hover:scale-110 transition-transform duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-xl hover:border-indigo-500/30 transition-all duration-300 group flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center rounded-xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013-3v1" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-left">Join Existing Room</h3>
+              <p className="text-gray-400 text-sm mb-6 text-left leading-relaxed">
+                Connect to an active room using a shared room ID from your teammate.
+              </p>
             </div>
-            <h3 className="text-xl font-bold mb-2 text-left">Join Existing Room</h3>
-            <p className="text-gray-400 text-sm mb-6 text-left leading-relaxed">
-              Connect to an active room using a shared room ID from your teammate.
-            </p>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                placeholder="Enter room ID..."
-                className="flex-1 bg-[#13111A] text-white placeholder-gray-500 border border-white/10 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
-              />
-              <button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95">
-                Join
-              </button>
+            <div>
+              {joinError && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-2.5 rounded-lg mb-4 text-center">
+                  {joinError}
+                </div>
+              )}
+              {joinSuccess && (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs p-2.5 rounded-lg mb-4 text-center font-medium">
+                  {joinSuccess}
+                </div>
+              )}
+              <form onSubmit={handleJoinRoom} className="flex gap-3">
+                <input
+                  type="text"
+                  placeholder="Enter room ID..."
+                  value={joinRoomCode}
+                  onChange={(e) => {
+                    setJoinRoomCode(e.target.value);
+                    if (joinError) setJoinError('');
+                  }}
+                  className="flex-1 bg-[#13111A] text-white placeholder-gray-500 border border-white/10 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                />
+                <button
+                  type="submit"
+                  disabled={joinLoading}
+                  className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  {joinLoading ? 'Joining...' : 'Join'}
+                </button>
+              </form>
             </div>
           </div>
         </div>
