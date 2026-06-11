@@ -11,11 +11,16 @@ const signup = async (req, res, next) => {
       throw new Error("All fields are required");
     }
 
-    const userExists = await User.findOne({ email });
-
-    if (userExists) {
+    const emailExists = await User.findOne({ email });
+    if (emailExists) {
       res.status(400);
       throw new Error("Email already exists");
+    }
+
+    const usernameExists = await User.findOne({ username });
+    if (usernameExists) {
+      res.status(400);
+      throw new Error("Username already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
