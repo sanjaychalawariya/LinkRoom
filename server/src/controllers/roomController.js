@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Room = require('../models/Room');
 const generateRoomCode = require('../utils/generateRoomCode');
 
@@ -89,20 +90,25 @@ const joinRoom = async (req, res, next) => {
   }
 };
 
-// @desc    Get room details by roomCode
-// @route   GET /api/rooms/:roomCode
+// @desc    Get room details by roomId or roomCode
+// @route   GET /api/rooms/:roomId
 // @access  Private
 const getRoomDetails = async (req, res, next) => {
   try {
-    const { roomCode } = req.params;
+    const { roomId } = req.params;
 
-    if (!roomCode) {
+    if (!roomId) {
       res.status(400);
-      throw new Error('Room code is required');
+      throw new Error('Room ID or Code is required');
     }
 
+    // Check if roomId is a valid Mongoose ObjectId
+    const query = mongoose.Types.ObjectId.isValid(roomId)
+      ? { _id: roomId }
+      : { roomCode: roomId.toUpperCase() };
+
     // Find the room and populate owner & participants
-    const room = await Room.findOne({ roomCode })
+    const room = await Room.findOne(query)
       .populate('owner', 'username email avatar')
       .populate('participants', 'username email avatar');
 
