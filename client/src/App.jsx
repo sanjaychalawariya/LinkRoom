@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import Room from './pages/Room';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -51,6 +52,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/room/:roomId" 
+              element={
+                <ProtectedRoute>
+                  <Room />
                 </ProtectedRoute>
               } 
             />
