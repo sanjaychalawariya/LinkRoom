@@ -42,6 +42,7 @@ const Login = () => {
       // Redirect to dashboard
       navigate('/dashboard');
     } catch (err) {
+      console.error("Login error details:", err);
       setError(
         err.response?.data?.message || 'Login failed. Please verify credentials.'
       );

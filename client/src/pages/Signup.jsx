@@ -47,6 +47,7 @@ const Signup = () => {
         navigate('/login');
       }, 2000);
     } catch (err) {
+      console.error("Signup error details:", err);
       setError(
         err.response?.data?.message || 'Registration failed. Please try again.'
       );

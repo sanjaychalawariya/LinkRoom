@@ -19,11 +19,13 @@ app.use(cors({
     if (
       allowedOrigins.includes(origin) ||
       origin.startsWith("http://localhost:") ||
-      origin.startsWith("http://127.0.0.1:")
+      origin.startsWith("http://127.0.0.1:") ||
+      origin.endsWith(".vercel.app")
     ) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      console.error(`CORS Blocked Origin: ${origin}`);
+      callback(new Error(`Not allowed by CORS: ${origin}`));
     }
   },
   credentials: true
