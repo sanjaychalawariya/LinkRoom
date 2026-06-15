@@ -57,6 +57,7 @@ const login = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (!user) {
+      console.log(`Login failed: User with email "${email}" not found.`);
       res.status(401);
       throw new Error("Invalid email or password");
     }
@@ -64,6 +65,7 @@ const login = async (req, res, next) => {
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatch) {
+      console.log(`Login failed: Password mismatch for email "${email}".`);
       res.status(401);
       throw new Error("Invalid email or password");
     }
