@@ -17,7 +17,6 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-  return (
     <nav className="w-full bg-[#0B0A0F]/80 backdrop-blur-md border-b border-white/10 py-4 px-4 md:px-6 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
         {/* Brand/Logo */}
