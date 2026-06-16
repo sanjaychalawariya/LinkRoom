@@ -5,14 +5,14 @@ import { API_BASE_URL } from '../api';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '',
     password: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { email, password } = formData;
+  const { identifier, password } = formData;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,8 +21,8 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError('Email and password are required');
+    if (!identifier || !password) {
+      setError('Email/username and password are required');
       return;
     }
 
@@ -31,7 +31,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
-        email,
+        identifier,
         password,
       });
 
@@ -73,14 +73,14 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wider mb-2">
-              Email Address
+              Email Address or Username
             </label>
             <input
-              type="email"
-              name="email"
-              value={email}
+              type="text"
+              name="identifier"
+              value={identifier}
               onChange={handleChange}
-              placeholder="john@example.com"
+              placeholder="john@gmail.com or johndoe"
               className="w-full bg-[#13111A] text-white placeholder-gray-500 border border-white/10 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all duration-200"
               required
             />

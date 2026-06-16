@@ -11,6 +11,12 @@ const signup = async (req, res, next) => {
       throw new Error("All fields are required");
     }
 
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!gmailRegex.test(email)) {
+      res.status(400);
+      throw new Error("Email must be a valid @gmail.com address");
+    }
+
     const emailExists = await User.findOne({ email });
     if (emailExists) {
       res.status(400);
@@ -47,27 +53,33 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, email, password } = req.body;
+    const loginId = identifier || email;
 
-    if (!email || !password) {
+    if (!loginId || !password) {
       res.status(400);
-      throw new Error("Email and password are required");
+      throw new Error("Email/username and password are required");
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      $or: [
+        { email: loginId.toLowerCase() },
+        { username: loginId }
+      ]
+    });
 
     if (!user) {
-      console.log(`Login failed: User with email "${email}" not found.`);
+      console.log(`Login failed: User with identifier "${loginId}" not found.`);
       res.status(401);
-      throw new Error("Invalid email or password");
+      throw new Error("Invalid email/username or password");
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatch) {
-      console.log(`Login failed: Password mismatch for email "${email}".`);
+      console.log(`Login failed: Password mismatch for identifier "${loginId}".`);
       res.status(401);
-      throw new Error("Invalid email or password");
+      throw new Error("Invalid email/username or password");
     }
 
     const token = jwt.sign(
@@ -115,8 +127,22 @@ const getMe = async (req, res, next) => {
   }
 };
 
+const deleteAccount = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    await User.findByIdAndDelete(userId);
+    res.status(200).json({
+      success: true,
+      message: "Account deleted successfully"
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   signup,
   login,
-  getMe
+  getMe,
+  deleteAccount
 };

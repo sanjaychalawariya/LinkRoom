@@ -18,6 +18,8 @@ const Dashboard = () => {
   const [joinError, setJoinError] = useState('');
   const [createLoading, setCreateLoading] = useState(false);
   const [joinLoading, setJoinLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -124,6 +126,36 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      'Are you sure you want to permanently delete your account? This action cannot be undone.'
+    );
+    if (!confirmDelete) return;
+
+    setDeleteLoading(true);
+    setDeleteError('');
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_BASE_URL}/api/auth/delete`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Clear storage and redirect
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      navigate('/signup');
+    } catch (err) {
+      setDeleteError(
+        err.response?.data?.message || 'Failed to delete account. Please try again.'
+      );
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0B0A0F] text-white flex justify-center items-center">
@@ -189,7 +221,7 @@ const Dashboard = () => {
                   {createSuccess}
                 </div>
               )}
-              <form onSubmit={handleCreateRoom} className="flex gap-3">
+              <form onSubmit={handleCreateRoom} className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   placeholder="Enter room name..."
@@ -235,7 +267,7 @@ const Dashboard = () => {
                   {joinSuccess}
                 </div>
               )}
-              <form onSubmit={handleJoinRoom} className="flex gap-3">
+              <form onSubmit={handleJoinRoom} className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   placeholder="Enter room ID..."
@@ -261,7 +293,7 @@ const Dashboard = () => {
         {/* User Profile Card */}
         <section className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl max-w-md">
           <h4 className="text-lg font-bold mb-4 text-left border-b border-white/10 pb-2">Your Profile</h4>
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-sm mb-6">
             <div className="flex justify-between">
               <span className="text-gray-400">Account ID:</span>
               <span className="font-mono text-violet-400">{user?.id}</span>
@@ -275,6 +307,20 @@ const Dashboard = () => {
               <span className="text-gray-300">{user?.email}</span>
             </div>
           </div>
+
+          {deleteError && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-2.5 rounded-lg mb-4 text-center">
+              {deleteError}
+            </div>
+          )}
+
+          <button
+            onClick={handleDeleteAccount}
+            disabled={deleteLoading}
+            className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/30 text-xs font-semibold py-3 px-4 rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+          >
+            {deleteLoading ? 'Deleting Account...' : 'Delete Account'}
+          </button>
         </section>
       </div>
     </div>

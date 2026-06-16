@@ -19,6 +19,7 @@ const Room = () => {
 
   // Copy status
   const [copied, setCopied] = useState(false);
+  const [showMobileParticipants, setShowMobileParticipants] = useState(false);
 
   const chatBottomRef = useRef(null);
 
@@ -271,20 +272,29 @@ const Room = () => {
       <section className="flex-1 flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#0B0A0F] to-[#120F24]">
         {/* Mobile Header */}
         <header className="p-4 border-b border-white/10 bg-[#100D1B]/80 backdrop-blur-md flex justify-between items-center md:hidden">
-          <div className="truncate pr-4">
-            <h2 className="text-lg font-bold truncate text-left">{room?.roomName}</h2>
-            <p className="text-[10px] text-gray-400 text-left font-mono">Code: {room?.roomCode}</p>
+          <div className="truncate pr-4 flex-1">
+            <h2 className="text-sm font-bold truncate text-left">{room?.roomName}</h2>
+            <p className="text-[9px] text-gray-400 text-left font-mono">Code: {room?.roomCode}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 shrink-0">
+            <button
+              onClick={() => setShowMobileParticipants(true)}
+              className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 font-semibold px-2 py-1.5 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span>{room?.participants?.length || 0}</span>
+            </button>
             <button
               onClick={handleCopyCode}
-              className="text-xs bg-violet-600 hover:bg-violet-500 text-white font-semibold px-2.5 py-1.5 rounded-lg transition-all"
+              className="text-xs bg-violet-600 hover:bg-violet-500 text-white font-semibold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
             >
               {copied ? 'Copied!' : 'Copy'}
             </button>
             <button
               onClick={() => navigate('/dashboard')}
-              className="text-xs bg-white/5 border border-white/10 text-gray-300 font-semibold px-2.5 py-1.5 rounded-lg transition-all"
+              className="text-xs bg-white/5 hover:bg-red-500/10 hover:text-red-400 border border-white/10 text-gray-300 font-semibold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
             >
               Leave
             </button>
@@ -381,6 +391,75 @@ const Room = () => {
           </form>
         </footer>
       </section>
+
+      {/* Mobile Participants Overlay Drawer */}
+      {showMobileParticipants && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden flex justify-end">
+          <div className="w-72 bg-[#100D1B] h-full p-6 flex flex-col justify-between border-l border-white/10 shadow-2xl transition-all duration-300">
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold text-white">Room Details</h3>
+                <button
+                  onClick={() => setShowMobileParticipants(false)}
+                  className="text-gray-400 hover:text-white p-1 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Room Header Info */}
+              <div className="mb-8 font-sans">
+                <h4 className="text-xl font-black text-white mb-2 text-left truncate">{room?.roomName}</h4>
+                <div className="flex items-center justify-between bg-white/5 border border-white/10 px-3 py-2 rounded-xl">
+                  <span className="text-xs text-gray-400">Code: <strong className="text-violet-400 font-mono">{room?.roomCode}</strong></span>
+                  <button
+                    onClick={handleCopyCode}
+                    className="text-xs bg-violet-600 hover:bg-violet-500 text-white font-semibold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                  >
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Participants List */}
+              <div className="font-sans">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 text-left">
+                  Active Members ({room?.participants?.length || 0})
+                </h3>
+                <ul className="space-y-3 overflow-y-auto max-h-[50vh]">
+                  {room?.participants?.map((participant) => (
+                    <li key={participant._id} className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-violet-600/10 border border-violet-500/20 text-violet-400 flex items-center justify-center font-bold text-xs uppercase shadow-sm">
+                        {participant.username.substring(0, 2)}
+                      </div>
+                      <span className="text-sm font-semibold text-gray-300 truncate">
+                        {participant.username}
+                        {participant._id === room.owner._id && (
+                          <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded-md ml-2 font-medium">Owner</span>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="border-t border-white/10 pt-4">
+              <button
+                onClick={() => {
+                  setShowMobileParticipants(false);
+                  navigate('/dashboard');
+                }}
+                className="w-full bg-white/5 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 text-gray-300 border border-white/10 font-semibold py-3 px-4 rounded-xl text-sm transition-all duration-200 active:scale-95 cursor-pointer"
+              >
+                Leave Workspace
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

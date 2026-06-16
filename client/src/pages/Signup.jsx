@@ -28,6 +28,12 @@ const Signup = () => {
       return;
     }
 
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!gmailRegex.test(email)) {
+      setError('Email must be a valid @gmail.com address');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setSuccess('');
