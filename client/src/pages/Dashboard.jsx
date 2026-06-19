@@ -138,15 +138,35 @@ const Dashboard = () => {
       );
 
       const joinedRoom = response.data.room;
-      setJoinSuccess(`Successfully joined room "${joinedRoom.roomName}"!`);
+      setJoinSuccess(`Successfully joined room "${joinedRoom.roomName}"! Redirecting...`);
       setJoinRoomCode('');
-      await fetchRooms();
-      // Clear success message after 5 seconds
-      setTimeout(() => setJoinSuccess(''), 5000);
+      setTimeout(() => {
+        navigate(`/room/${joinedRoom.id}`);
+      }, 1000);
     } catch (err) {
       setJoinError(err.response?.data?.message || 'Failed to join room.');
     } finally {
       setJoinLoading(false);
+    }
+  };
+
+  const handleDeleteRoom = async (roomId, roomName) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to permanently delete the room "${roomName}"? This action will delete all messages in this room.`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_BASE_URL}/api/rooms/${roomId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      await fetchRooms();
+    } catch (err) {
+      console.error('Failed to delete room:', err);
+      alert(err.response?.data?.message || 'Failed to delete room. Please try again.');
     }
   };
 
@@ -322,107 +342,59 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Rooms Sections */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Rooms Created Section */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl flex flex-col justify-between">
-            <div>
-              <h3 className="text-xl font-bold mb-4 text-left border-b border-white/10 pb-2 flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-violet-500"></span>
-                Rooms You Created ({rooms.filter((r) => r.owner?.id === user?.id || r.owner === user?.id).length})
-              </h3>
-              {roomsLoading ? (
-                <div className="py-8 text-center text-gray-500 text-sm">Loading rooms...</div>
-              ) : rooms.filter((r) => r.owner?.id === user?.id || r.owner === user?.id).length === 0 ? (
-                <div className="py-8 text-center text-gray-500 text-sm italic">
-                  No rooms created yet.
-                </div>
-              ) : (
-                <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
-                  {rooms
-                    .filter((r) => r.owner?.id === user?.id || r.owner === user?.id)
-                    .map((room) => (
-                      <div
-                        key={room.id}
-                        className="bg-[#13111A] border border-white/5 p-4 rounded-xl flex items-center justify-between hover:border-violet-500/30 transition-all"
-                      >
-                        <div className="text-left truncate pr-4">
-                          <h4 className="font-semibold text-white truncate">{room.roomName}</h4>
-                          <p className="text-xs text-gray-400 mt-1">
-                            Code:{' '}
-                            <span className="font-mono text-violet-400 select-all">{room.roomCode}</span>
-                          </p>
-                        </div>
-                        <div className="flex gap-2 shrink-0">
-                          <button
-                            onClick={() => handleCopyRoomCode(room.roomCode)}
-                            className="text-xs bg-white/5 hover:bg-white/10 text-gray-300 font-semibold px-2.5 py-1.5 rounded-lg border border-white/10 transition-colors cursor-pointer"
-                          >
-                            {copiedRoomCode === room.roomCode ? 'Copied!' : 'Copy'}
-                          </button>
-                          <button
-                            onClick={() => navigate(`/room/${room.id}`)}
-                            className="text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer"
-                          >
-                            Enter
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              )}
+        {/* Rooms Section */}
+        <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-xl mb-12">
+          <h3 className="text-2xl font-bold mb-6 text-left border-b border-white/10 pb-3 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-violet-500 animate-pulse"></span>
+            Rooms You Created ({rooms.length})
+          </h3>
+          {roomsLoading ? (
+            <div className="py-12 text-center text-gray-400 text-sm">
+              <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+              Loading rooms...
             </div>
-          </div>
-
-          {/* Rooms Joined Section */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl flex flex-col justify-between">
-            <div>
-              <h3 className="text-xl font-bold mb-4 text-left border-b border-white/10 pb-2 flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                Rooms You Joined ({rooms.filter((r) => r.owner?.id !== user?.id && r.owner !== user?.id).length})
-              </h3>
-              {roomsLoading ? (
-                <div className="py-8 text-center text-gray-500 text-sm">Loading rooms...</div>
-              ) : rooms.filter((r) => r.owner?.id !== user?.id && r.owner !== user?.id).length === 0 ? (
-                <div className="py-8 text-center text-gray-500 text-sm italic">
-                  No rooms joined yet. Try joining one using a code.
-                </div>
-              ) : (
-                <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
-                  {rooms
-                    .filter((r) => r.owner?.id !== user?.id && r.owner !== user?.id)
-                    .map((room) => (
-                      <div
-                        key={room.id}
-                        className="bg-[#13111A] border border-white/5 p-4 rounded-xl flex items-center justify-between hover:border-indigo-500/30 transition-all"
-                      >
-                        <div className="text-left truncate pr-4">
-                          <h4 className="font-semibold text-white truncate">{room.roomName}</h4>
-                          <p className="text-xs text-gray-400 mt-1">
-                            Code:{' '}
-                            <span className="font-mono text-indigo-400 select-all">{room.roomCode}</span>
-                          </p>
-                        </div>
-                        <div className="flex gap-2 shrink-0">
-                          <button
-                            onClick={() => handleCopyRoomCode(room.roomCode)}
-                            className="text-xs bg-white/5 hover:bg-white/10 text-gray-300 font-semibold px-2.5 py-1.5 rounded-lg border border-white/10 transition-colors cursor-pointer"
-                          >
-                            {copiedRoomCode === room.roomCode ? 'Copied!' : 'Copy'}
-                          </button>
-                          <button
-                            onClick={() => navigate(`/room/${room.id}`)}
-                            className="text-xs bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer"
-                          >
-                            Enter
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              )}
+          ) : rooms.length === 0 ? (
+            <div className="py-12 text-center text-gray-500 text-sm italic">
+              No workspace rooms created yet. Use the card above to create your first room!
             </div>
-          </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-4 max-h-[450px] overflow-y-auto pr-1">
+              {rooms.map((room) => (
+                <div
+                  key={room.id}
+                  className="bg-[#13111A] border border-white/5 p-5 rounded-xl flex flex-col justify-between gap-4 hover:border-violet-500/30 hover:bg-[#161320] transition-all duration-300"
+                >
+                  <div className="text-left truncate">
+                    <h4 className="font-bold text-lg text-white truncate">{room.roomName}</h4>
+                    <p className="text-xs text-gray-400 mt-1.5">
+                      Code:{' '}
+                      <span className="font-mono text-violet-400 select-all font-semibold bg-violet-500/10 px-2 py-0.5 rounded-md">{room.roomCode}</span>
+                    </p>
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      onClick={() => handleCopyRoomCode(room.roomCode)}
+                      className="text-xs bg-white/5 hover:bg-white/10 text-gray-300 font-semibold px-3 py-2 rounded-lg border border-white/10 transition-colors cursor-pointer"
+                    >
+                      {copiedRoomCode === room.roomCode ? 'Copied!' : 'Copy Code'}
+                    </button>
+                    <button
+                      onClick={() => navigate(`/room/${room.id}`)}
+                      className="text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer font-bold"
+                    >
+                      Enter Room
+                    </button>
+                    <button
+                      onClick={() => handleDeleteRoom(room.id, room.roomName)}
+                      className="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/30 font-semibold px-3 py-2 rounded-lg transition-all cursor-pointer"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* User Profile Card */}

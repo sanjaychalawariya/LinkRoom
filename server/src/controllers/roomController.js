@@ -141,7 +141,7 @@ const getRoomDetails = async (req, res, next) => {
     next(error);
   }
 };
-// @desc    Get all rooms created or joined by the user
+// @desc    Get all rooms created by the user
 // @route   GET /api/rooms
 // @access  Private
 const getUserRooms = async (req, res, next) => {
@@ -151,13 +151,8 @@ const getUserRooms = async (req, res, next) => {
       throw new Error('Not authorized, user missing');
     }
 
-    // Find rooms where user is owner or participant
-    const rooms = await Room.find({
-      $or: [
-        { owner: req.user._id },
-        { participants: req.user._id },
-      ],
-    })
+    // Find rooms where user is owner
+    const rooms = await Room.find({ owner: req.user._id })
       .populate('owner', 'username email')
       .populate('participants', 'username email')
       .sort({ createdAt: -1 });
@@ -178,10 +173,52 @@ const getUserRooms = async (req, res, next) => {
   }
 };
 
+// @desc    Delete a chat room
+// @route   DELETE /api/rooms/:roomId
+// @access  Private
+const deleteRoom = async (req, res, next) => {
+  try {
+    const { roomId } = req.params;
+
+    if (!roomId) {
+      res.status(400);
+      throw new Error('Room ID is required');
+    }
+
+    const room = await Room.findById(roomId);
+
+    if (!room) {
+      res.status(404);
+      throw new Error('Room not found');
+    }
+
+    // Verify ownership
+    if (room.owner.toString() !== req.user._id.toString()) {
+      res.status(403);
+      throw new Error('Not authorized to delete this room');
+    }
+
+    // Delete the room
+    await room.deleteOne();
+
+    // Delete all messages associated with the room
+    const Message = require('../models/Message');
+    await Message.deleteMany({ room: roomId });
+
+    res.status(200).json({
+      success: true,
+      message: 'Room and its messages deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createRoom,
   joinRoom,
   getRoomDetails,
   getUserRooms,
+  deleteRoom,
 };
 
