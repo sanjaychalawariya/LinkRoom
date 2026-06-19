@@ -21,8 +21,31 @@ const Dashboard = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
+  // Rooms states
+  const [rooms, setRooms] = useState([]);
+  const [roomsLoading, setRoomsLoading] = useState(true);
+  const [copiedRoomCode, setCopiedRoomCode] = useState('');
+
+  const fetchRooms = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/rooms`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setRooms(response.data.rooms);
+    } catch (err) {
+      console.error('Failed to fetch rooms:', err);
+    } finally {
+      setRoomsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndRooms = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
         navigate('/login');
@@ -37,6 +60,7 @@ const Dashboard = () => {
         });
 
         setUser(response.data.user);
+        await fetchRooms();
       } catch (err) {
         console.error(err);
         setError('Session expired. Please log in again.');
@@ -51,7 +75,7 @@ const Dashboard = () => {
       }
     };
 
-    fetchUser();
+    fetchUserAndRooms();
   }, [navigate]);
 
   const handleCreateRoom = async (e) => {
@@ -80,9 +104,9 @@ const Dashboard = () => {
       const createdRoom = response.data.room;
       setCreateSuccess(`Room "${createdRoom.roomName}" created! Code: ${createdRoom.roomCode}`);
       setNewRoomName('');
-      setTimeout(() => {
-        navigate(`/room/${createdRoom.id}`);
-      }, 1000);
+      await fetchRooms();
+      // Clear success message after 5 seconds
+      setTimeout(() => setCreateSuccess(''), 5000);
     } catch (err) {
       setCreateError(err.response?.data?.message || 'Failed to create room.');
     } finally {
@@ -116,14 +140,22 @@ const Dashboard = () => {
       const joinedRoom = response.data.room;
       setJoinSuccess(`Successfully joined room "${joinedRoom.roomName}"!`);
       setJoinRoomCode('');
-      setTimeout(() => {
-        navigate(`/room/${joinedRoom.id}`);
-      }, 1000);
+      await fetchRooms();
+      // Clear success message after 5 seconds
+      setTimeout(() => setJoinSuccess(''), 5000);
     } catch (err) {
       setJoinError(err.response?.data?.message || 'Failed to join room.');
     } finally {
       setJoinLoading(false);
     }
+  };
+
+  const handleCopyRoomCode = (code) => {
+    navigator.clipboard.writeText(code);
+    setCopiedRoomCode(code);
+    setTimeout(() => {
+      setCopiedRoomCode('');
+    }, 2000);
   };
 
   const handleDeleteAccount = async () => {
@@ -286,6 +318,109 @@ const Dashboard = () => {
                   {joinLoading ? 'Joining...' : 'Join'}
                 </button>
               </form>
+            </div>
+          </div>
+        </div>
+
+        {/* Rooms Sections */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {/* Rooms Created Section */}
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+            <div>
+              <h3 className="text-xl font-bold mb-4 text-left border-b border-white/10 pb-2 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-violet-500"></span>
+                Rooms You Created ({rooms.filter((r) => r.owner?.id === user?.id || r.owner === user?.id).length})
+              </h3>
+              {roomsLoading ? (
+                <div className="py-8 text-center text-gray-500 text-sm">Loading rooms...</div>
+              ) : rooms.filter((r) => r.owner?.id === user?.id || r.owner === user?.id).length === 0 ? (
+                <div className="py-8 text-center text-gray-500 text-sm italic">
+                  No rooms created yet.
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
+                  {rooms
+                    .filter((r) => r.owner?.id === user?.id || r.owner === user?.id)
+                    .map((room) => (
+                      <div
+                        key={room.id}
+                        className="bg-[#13111A] border border-white/5 p-4 rounded-xl flex items-center justify-between hover:border-violet-500/30 transition-all"
+                      >
+                        <div className="text-left truncate pr-4">
+                          <h4 className="font-semibold text-white truncate">{room.roomName}</h4>
+                          <p className="text-xs text-gray-400 mt-1">
+                            Code:{' '}
+                            <span className="font-mono text-violet-400 select-all">{room.roomCode}</span>
+                          </p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <button
+                            onClick={() => handleCopyRoomCode(room.roomCode)}
+                            className="text-xs bg-white/5 hover:bg-white/10 text-gray-300 font-semibold px-2.5 py-1.5 rounded-lg border border-white/10 transition-colors cursor-pointer"
+                          >
+                            {copiedRoomCode === room.roomCode ? 'Copied!' : 'Copy'}
+                          </button>
+                          <button
+                            onClick={() => navigate(`/room/${room.id}`)}
+                            className="text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                          >
+                            Enter
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Rooms Joined Section */}
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+            <div>
+              <h3 className="text-xl font-bold mb-4 text-left border-b border-white/10 pb-2 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                Rooms You Joined ({rooms.filter((r) => r.owner?.id !== user?.id && r.owner !== user?.id).length})
+              </h3>
+              {roomsLoading ? (
+                <div className="py-8 text-center text-gray-500 text-sm">Loading rooms...</div>
+              ) : rooms.filter((r) => r.owner?.id !== user?.id && r.owner !== user?.id).length === 0 ? (
+                <div className="py-8 text-center text-gray-500 text-sm italic">
+                  No rooms joined yet. Try joining one using a code.
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
+                  {rooms
+                    .filter((r) => r.owner?.id !== user?.id && r.owner !== user?.id)
+                    .map((room) => (
+                      <div
+                        key={room.id}
+                        className="bg-[#13111A] border border-white/5 p-4 rounded-xl flex items-center justify-between hover:border-indigo-500/30 transition-all"
+                      >
+                        <div className="text-left truncate pr-4">
+                          <h4 className="font-semibold text-white truncate">{room.roomName}</h4>
+                          <p className="text-xs text-gray-400 mt-1">
+                            Code:{' '}
+                            <span className="font-mono text-indigo-400 select-all">{room.roomCode}</span>
+                          </p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <button
+                            onClick={() => handleCopyRoomCode(room.roomCode)}
+                            className="text-xs bg-white/5 hover:bg-white/10 text-gray-300 font-semibold px-2.5 py-1.5 rounded-lg border border-white/10 transition-colors cursor-pointer"
+                          >
+                            {copiedRoomCode === room.roomCode ? 'Copied!' : 'Copy'}
+                          </button>
+                          <button
+                            onClick={() => navigate(`/room/${room.id}`)}
+                            className="text-xs bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                          >
+                            Enter
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -62,6 +62,16 @@ const chatSocket = (io) => {
       });
     });
 
+    // User is typing
+    socket.on('typing', ({ roomId, user }) => {
+      socket.to(roomId).emit('user_typing', { user });
+    });
+
+    // User stopped typing
+    socket.on('stop_typing', ({ roomId, user }) => {
+      socket.to(roomId).emit('user_stop_typing', { user });
+    });
+
     socket.on('disconnect', () => {
       console.log(`User disconnected: ${socket.id}`);
     });

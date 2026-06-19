@@ -141,9 +141,47 @@ const getRoomDetails = async (req, res, next) => {
     next(error);
   }
 };
+// @desc    Get all rooms created or joined by the user
+// @route   GET /api/rooms
+// @access  Private
+const getUserRooms = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      res.status(401);
+      throw new Error('Not authorized, user missing');
+    }
+
+    // Find rooms where user is owner or participant
+    const rooms = await Room.find({
+      $or: [
+        { owner: req.user._id },
+        { participants: req.user._id },
+      ],
+    })
+      .populate('owner', 'username email')
+      .populate('participants', 'username email')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      rooms: rooms.map((room) => ({
+        id: room._id,
+        roomName: room.roomName,
+        roomCode: room.roomCode,
+        owner: room.owner,
+        participants: room.participants,
+        createdAt: room.createdAt,
+      })),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   createRoom,
   joinRoom,
   getRoomDetails,
+  getUserRooms,
 };
+

@@ -21,11 +21,24 @@ const Room = () => {
   const [copied, setCopied] = useState(false);
   const [showMobileParticipants, setShowMobileParticipants] = useState(false);
 
+  // Typing states
+  const [typingUsers, setTypingUsers] = useState({});
+  const isTypingRef = useRef(false);
+  const typingTimeoutRef = useRef(null);
+
   const chatBottomRef = useRef(null);
 
   // Auto scroll to bottom
   const scrollToBottom = () => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const getTypingText = () => {
+    const names = Object.values(typingUsers);
+    if (names.length === 0) return '';
+    if (names.length === 1) return `${names[0]} is typing...`;
+    if (names.length === 2) return `${names[0]} and ${names[1]} are typing...`;
+    return 'Several people are typing...';
   };
 
   useEffect(() => {
@@ -103,6 +116,11 @@ const Room = () => {
     // Listen for incoming messages
     socket.on('receive_message', (message) => {
       setMessages((prev) => [...prev, message]);
+      setTypingUsers((prevTyping) => {
+        const next = { ...prevTyping };
+        delete next[message.sender.id];
+        return next;
+      });
     });
 
     // Listen for presence events
@@ -148,6 +166,29 @@ const Room = () => {
           participants: prevRoom.participants.filter((p) => p._id !== user.id),
         };
       });
+
+      // Clear from typing users
+      setTypingUsers((prevTyping) => {
+        const next = { ...prevTyping };
+        delete next[user.id];
+        return next;
+      });
+    });
+
+    // Listen for typing events
+    socket.on('user_typing', ({ user }) => {
+      setTypingUsers((prevTyping) => ({
+        ...prevTyping,
+        [user.id]: user.username,
+      }));
+    });
+
+    socket.on('user_stop_typing', ({ user }) => {
+      setTypingUsers((prevTyping) => {
+        const next = { ...prevTyping };
+        delete next[user.id];
+        return next;
+      });
     });
 
     // Clean up on unmount
@@ -156,10 +197,17 @@ const Room = () => {
         roomId: room.id,
         user: { id: currentUser.id, username: currentUser.username },
       });
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
       // Remove listeners and disconnect
       socket.off('receive_message');
       socket.off('user_joined');
       socket.off('user_left');
+      socket.off('user_typing');
+      socket.off('user_stop_typing');
       socket.disconnect();
     };
   }, [room?.id, currentUser]);
@@ -167,6 +215,18 @@ const Room = () => {
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !socket || !room || !currentUser) return;
+
+    // Clear typing indicator status
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    if (isTypingRef.current) {
+      socket.emit('stop_typing', {
+        roomId: room.id,
+        user: { id: currentUser.id, username: currentUser.username },
+      });
+      isTypingRef.current = false;
+    }
 
     // Emit message to Socket Server
     socket.emit('send_message', {
@@ -179,6 +239,32 @@ const Room = () => {
     });
 
     setNewMessage('');
+  };
+
+  const handleInputChange = (e) => {
+    setNewMessage(e.target.value);
+
+    if (!socket || !room || !currentUser) return;
+
+    if (!isTypingRef.current) {
+      isTypingRef.current = true;
+      socket.emit('typing', {
+        roomId: room.id,
+        user: { id: currentUser.id, username: currentUser.username },
+      });
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit('stop_typing', {
+        roomId: room.id,
+        user: { id: currentUser.id, username: currentUser.username },
+      });
+      isTypingRef.current = false;
+    }, 2000);
   };
 
   const handleCopyCode = () => {
@@ -368,6 +454,19 @@ const Room = () => {
               );
             })
           )}
+
+          {/* Typing Indicator */}
+          {Object.keys(typingUsers).length > 0 && (
+            <div className="flex items-center gap-2 text-xs text-gray-400 italic bg-[#151221]/50 border border-white/5 px-3 py-1.5 rounded-full w-fit animate-pulse my-2">
+              <div className="flex gap-1 shrink-0">
+                <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+              </div>
+              <span>{getTypingText()}</span>
+            </div>
+          )}
+
           <div ref={chatBottomRef} />
         </div>
 
@@ -378,7 +477,7 @@ const Room = () => {
               type="text"
               placeholder="Type a message..."
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={handleInputChange}
               className="flex-1 bg-[#13111A] text-white placeholder-gray-500 border border-white/10 px-5 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all duration-200"
             />
             <button
