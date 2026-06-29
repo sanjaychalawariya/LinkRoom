@@ -17,16 +17,16 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="w-full bg-[#0B0A0F]/80 backdrop-blur-md border-b border-white/10 py-4 px-4 md:px-6 sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
+    <nav className="mx-auto max-w-6xl w-[95%] mt-4 bg-[#e9edc9]/80 backdrop-blur-md border-2 border-[#ccd5ae]/40 py-3.5 px-4 md:px-6 sticky top-4 z-50 rounded-full shadow-md">
+      <div className="flex justify-between items-center">
         {/* Brand/Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-9 h-9 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-900/30 group-hover:rotate-6 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+          <div className="w-9 h-9 bg-gradient-to-tr from-[#ccd5ae] to-[#d4a373] rounded-full flex items-center justify-center shadow-md shadow-[#d4a373]/10 group-hover:rotate-6 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#fefae0]" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
             </svg>
           </div>
-          <span className="text-lg md:text-xl font-black text-white tracking-wider bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent group-hover:opacity-90 transition-opacity">
+          <span className="text-lg md:text-xl font-black text-[#2b271d] tracking-wider group-hover:opacity-90 transition-opacity">
             LinkRoom
           </span>
         </Link>
@@ -38,19 +38,19 @@ const Navbar = () => {
               <Link
                 to="/dashboard"
                 className={`text-sm font-semibold transition-colors duration-200 ${
-                  isActive('/dashboard') ? 'text-violet-400' : 'text-gray-300 hover:text-white'
+                  isActive('/dashboard') ? 'text-[#d4a373] font-bold' : 'text-[#4a4538] hover:text-[#2b271d]'
                 }`}
               >
                 Dashboard
               </Link>
-              <div className="h-4 w-px bg-white/10"></div>
+              <div className="h-4 w-px bg-[#ccd5ae]/50"></div>
               <div className="flex items-center gap-2 md:gap-3">
-                <span className="text-sm text-gray-400 hidden sm:inline">
-                  Hi, <strong className="text-gray-200 font-semibold">{user?.username}</strong>
+                <span className="text-sm text-[#4a4538] hidden sm:inline">
+                  Hi, <strong className="text-[#2b271d] font-bold">{user?.username}</strong>
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="bg-white/5 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 text-gray-300 border border-white/10 text-xs font-semibold px-3 py-1.5 md:px-4 md:py-2 rounded-xl transition-all duration-200 cursor-pointer active:scale-95"
+                  className="bg-[#fefae0] hover:bg-rose-500/10 hover:text-rose-600 hover:border-rose-500/25 text-[#4a4538] border border-[#ccd5ae] text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-200 cursor-pointer active:scale-95"
                 >
                   Log Out
                 </button>
@@ -61,14 +61,14 @@ const Navbar = () => {
               <Link
                 to="/login"
                 className={`text-sm font-semibold transition-colors duration-200 ${
-                  isActive('/login') ? 'text-violet-400' : 'text-gray-300 hover:text-white'
+                  isActive('/login') ? 'text-[#d4a373] font-bold' : 'text-[#4a4538] hover:text-[#2b271d]'
                 }`}
               >
                 Sign In
               </Link>
               <Link
                 to="/signup"
-                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-semibold px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-md transition-all duration-200 active:scale-95"
+                className="bg-gradient-to-r from-[#ccd5ae] to-[#d4a373] hover:opacity-90 text-[#2b271d] text-xs font-black px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-sm shadow-[#d4a373]/15 transition-all duration-200 active:scale-95"
               >
                 Sign Up
               </Link>

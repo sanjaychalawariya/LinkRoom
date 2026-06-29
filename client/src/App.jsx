@@ -27,7 +27,7 @@ const PublicRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#0B0A0F] flex flex-col font-sans">
+      <div className="min-h-screen bg-brand-bg text-[#4a4538] flex flex-col font-sans">
         <Navbar />
         <main className="flex-grow">
           <Routes>

@@ -181,10 +181,10 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B0A0F] text-white flex justify-center items-center">
+      <div className="min-h-screen bg-[#fefae0] text-[#2b271d] flex justify-center items-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400 text-sm">Verifying session...</p>
+          <div className="w-12 h-12 border-4 border-[#d4a373] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#4a4538]/70 text-sm font-bold">Verifying session...</p>
         </div>
       </div>
     );
@@ -192,28 +192,28 @@ const Dashboard = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0B0A0F] text-white flex justify-center items-center">
-        <div className="bg-white/5 border border-white/10 p-6 rounded-2xl max-w-sm text-center">
-          <div className="text-red-400 mb-4 text-xl font-semibold">Error</div>
-          <p className="text-gray-300 text-sm mb-4">{error}</p>
+      <div className="min-h-screen bg-[#fefae0] text-[#2b271d] flex justify-center items-center">
+        <div className="bg-[#faedcd]/60 border-2 border-[#ccd5ae]/30 p-6 rounded-[32px] max-w-sm text-center">
+          <div className="text-rose-600 mb-4 text-xl font-bold">Error</div>
+          <p className="text-[#4a4538] text-sm mb-4">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0A0F] bg-gradient-to-b from-[#110D23] to-[#0B0A0F] text-white">
+    <div className="min-h-screen bg-[#fefae0] bg-gradient-to-b from-[#e9edc9]/35 to-[#fefae0] text-[#2b271d]">
       {/* Glow Effects */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-10 left-10 w-80 h-80 bg-violet-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#d4a373]/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-10 left-10 w-80 h-80 bg-[#ccd5ae]/15 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Welcome Section */}
         <header className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-2 text-left bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#2b271d] mb-2 text-left">
             Welcome, {user?.username || 'User'}!
           </h1>
-          <p className="text-gray-400 text-left text-sm md:text-base">
+          <p className="text-[#4a4538]/80 text-left text-sm md:text-base">
             Create or join a workspace chat room to begin messaging in real time.
           </p>
         </header>
@@ -221,26 +221,26 @@ const Dashboard = () => {
         {/* Dashboard Grid */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Create Room Card */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-xl hover:border-violet-500/30 transition-all duration-300 group flex flex-col justify-between">
+          <div className="bg-[#faedcd]/60 backdrop-blur-md border-2 border-[#ccd5ae]/30 p-8 rounded-[32px] shadow-sm hover:shadow-md hover:border-[#ccd5ae]/60 transition-all duration-300 group flex flex-col justify-between">
             <div>
-              <div className="w-12 h-12 bg-violet-600/10 border border-violet-500/20 text-violet-400 flex items-center justify-center rounded-xl mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="w-12 h-12 bg-[#ccd5ae]/30 border-2 border-[#ccd5ae]/50 text-[#4a4538] flex items-center justify-center rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold mb-2 text-left">Create a New Room</h3>
-              <p className="text-gray-400 text-sm mb-6 text-left leading-relaxed">
+              <h3 className="text-xl font-black mb-2 text-left text-[#2b271d]">Create a New Room</h3>
+              <p className="text-[#4a4538]/80 text-sm mb-6 text-left leading-relaxed">
                 Start a new chat room, get a unique room ID, and invite your team members.
               </p>
             </div>
             <div>
               {createError && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-2.5 rounded-lg mb-4 text-center">
+                <div className="bg-red-500/10 border border-red-500/20 text-red-650 text-xs p-2.5 rounded-full mb-4 text-center">
                   {createError}
                 </div>
               )}
               {createSuccess && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs p-2.5 rounded-lg mb-4 text-center font-medium">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-655 text-xs p-2.5 rounded-full mb-4 text-center font-medium">
                   {createSuccess}
                 </div>
               )}
@@ -253,12 +253,12 @@ const Dashboard = () => {
                     setNewRoomName(e.target.value);
                     if (createError) setCreateError('');
                   }}
-                  className="flex-1 bg-[#13111A] text-white placeholder-gray-500 border border-white/10 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all"
+                  className="flex-1 bg-[#fefae0] text-[#2b271d] placeholder-[#4a4538]/50 border-2 border-[#ccd5ae]/40 px-5 py-2.5 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#d4a373]/30 focus:border-[#d4a373] transition-all"
                 />
                 <button
                   type="submit"
                   disabled={createLoading}
-                  className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+                  className="bg-gradient-to-r from-[#ccd5ae] to-[#d4a373] hover:opacity-90 text-[#2b271d] font-bold text-sm px-6 py-2.5 rounded-full transition-all duration-205 active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-sm shadow-[#d4a373]/10 cursor-pointer"
                 >
                   {createLoading ? 'Creating...' : 'Create'}
                 </button>
@@ -267,26 +267,26 @@ const Dashboard = () => {
           </div>
 
           {/* Join Room Card */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-xl hover:border-indigo-500/30 transition-all duration-300 group flex flex-col justify-between">
+          <div className="bg-[#faedcd]/60 backdrop-blur-md border-2 border-[#ccd5ae]/30 p-8 rounded-[32px] shadow-sm hover:shadow-md hover:border-[#ccd5ae]/60 transition-all duration-300 group flex flex-col justify-between">
             <div>
-              <div className="w-12 h-12 bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center rounded-xl mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="w-12 h-12 bg-[#e9edc9] border-2 border-[#ccd5ae]/50 text-[#4a4538] flex items-center justify-center rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013-3v1" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold mb-2 text-left">Join Existing Room</h3>
-              <p className="text-gray-400 text-sm mb-6 text-left leading-relaxed">
+              <h3 className="text-xl font-black mb-2 text-left text-[#2b271d]">Join Existing Room</h3>
+              <p className="text-[#4a4538]/80 text-sm mb-6 text-left leading-relaxed">
                 Connect to an active room using a shared room ID from your teammate.
               </p>
             </div>
             <div>
               {joinError && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-2.5 rounded-lg mb-4 text-center">
+                <div className="bg-red-500/10 border border-red-500/20 text-red-655 text-xs p-2.5 rounded-full mb-4 text-center">
                   {joinError}
                 </div>
               )}
               {joinSuccess && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs p-2.5 rounded-lg mb-4 text-center font-medium">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-655 text-xs p-2.5 rounded-full mb-4 text-center font-medium">
                   {joinSuccess}
                 </div>
               )}
@@ -299,12 +299,12 @@ const Dashboard = () => {
                     setJoinRoomCode(e.target.value);
                     if (joinError) setJoinError('');
                   }}
-                  className="flex-1 bg-[#13111A] text-white placeholder-gray-500 border border-white/10 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                  className="flex-1 bg-[#fefae0] text-[#2b271d] placeholder-[#4a4538]/50 border-2 border-[#ccd5ae]/40 px-5 py-2.5 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#d4a373]/30 focus:border-[#d4a373] transition-all"
                 />
                 <button
                   type="submit"
                   disabled={joinLoading}
-                  className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+                  className="bg-gradient-to-r from-[#d4a373] to-[#ccd5ae] hover:opacity-90 text-[#2b271d] font-bold text-sm px-6 py-2.5 rounded-full transition-all duration-205 active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-sm shadow-[#ccd5ae]/10 cursor-pointer"
                 >
                   {joinLoading ? 'Joining...' : 'Join'}
                 </button>
@@ -314,18 +314,18 @@ const Dashboard = () => {
         </div>
 
         {/* Rooms Section */}
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-xl mb-12">
-          <h3 className="text-2xl font-bold mb-6 text-left border-b border-white/10 pb-3 flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-violet-500 animate-pulse"></span>
+        <div className="bg-[#faedcd]/40 backdrop-blur-md border-2 border-[#ccd5ae]/30 p-8 rounded-[32px] shadow-sm mb-12">
+          <h3 className="text-2xl font-black mb-6 text-left border-b border-[#ccd5ae]/20 pb-3 flex items-center gap-2 text-[#2b271d]">
+            <span className="w-3 h-3 rounded-full bg-[#d4a373] animate-pulse"></span>
             Rooms You Created ({rooms.length})
           </h3>
           {roomsLoading ? (
-            <div className="py-12 text-center text-gray-400 text-sm">
-              <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <div className="py-12 text-center text-[#4a4538]/70 text-sm font-semibold">
+              <div className="w-8 h-8 border-4 border-[#d4a373] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
               Loading rooms...
             </div>
           ) : rooms.length === 0 ? (
-            <div className="py-12 text-center text-gray-500 text-sm italic">
+            <div className="py-12 text-center text-[#4a4538]/50 text-sm italic">
               No workspace rooms created yet. Use the card above to create your first room!
             </div>
           ) : (
@@ -333,31 +333,31 @@ const Dashboard = () => {
               {rooms.map((room) => (
                 <div
                   key={room.id}
-                  className="bg-[#13111A] border border-white/5 p-5 rounded-xl flex flex-col justify-between gap-4 hover:border-violet-500/30 hover:bg-[#161320] transition-all duration-300"
+                  className="bg-[#fefae0] border-2 border-[#ccd5ae]/30 p-5 rounded-2xl flex flex-col justify-between gap-4 hover:border-[#d4a373]/50 hover:bg-[#fefae0]/85 transition-all duration-300"
                 >
                   <div className="text-left truncate">
-                    <h4 className="font-bold text-lg text-white truncate">{room.roomName}</h4>
-                    <p className="text-xs text-gray-400 mt-1.5">
+                    <h4 className="font-bold text-lg text-[#2b271d] truncate">{room.roomName}</h4>
+                    <p className="text-xs text-[#4a4538] mt-1.5 flex items-center gap-1.5">
                       Code:{' '}
-                      <span className="font-mono text-violet-400 select-all font-semibold bg-violet-500/10 px-2 py-0.5 rounded-md">{room.roomCode}</span>
+                      <span className="font-mono text-[#d4a373] select-all font-bold bg-[#faedcd] px-3 py-0.5 rounded-full text-[11px]">{room.roomCode}</span>
                     </p>
                   </div>
                   <div className="flex gap-2 justify-end">
                     <button
                       onClick={() => handleCopyRoomCode(room.roomCode)}
-                      className="text-xs bg-white/5 hover:bg-white/10 text-gray-300 font-semibold px-3 py-2 rounded-lg border border-white/10 transition-colors cursor-pointer"
+                      className="text-xs bg-[#faedcd] hover:bg-[#ccd5ae]/20 text-[#4a4538] font-bold px-3.5 py-2 rounded-full border border-[#ccd5ae]/60 transition-colors cursor-pointer"
                     >
                       {copiedRoomCode === room.roomCode ? 'Copied!' : 'Copy Code'}
                     </button>
                     <button
                       onClick={() => navigate(`/room/${room.id}`)}
-                      className="text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold px-4 py-2 rounded-lg transition-all cursor-pointer font-bold"
+                      className="text-xs bg-gradient-to-r from-[#ccd5ae] to-[#d4a373] hover:opacity-90 text-[#2b271d] font-black px-4.5 py-2 rounded-full transition-all cursor-pointer shadow-sm shadow-[#d4a373]/10"
                     >
                       Enter Room
                     </button>
                     <button
                       onClick={() => handleDeleteRoom(room.id, room.roomName)}
-                      className="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/30 font-semibold px-3 py-2 rounded-lg transition-all cursor-pointer"
+                      className="text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 border border-rose-500/20 hover:border-rose-500/30 font-bold px-3.5 py-2 rounded-full transition-all cursor-pointer"
                     >
                       Delete
                     </button>
@@ -369,16 +369,16 @@ const Dashboard = () => {
         </div>
 
         {/* User Profile Card */}
-        <section className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl max-w-md">
-          <h4 className="text-lg font-bold mb-4 text-left border-b border-white/10 pb-2">Your Profile</h4>
+        <section className="bg-[#faedcd]/40 backdrop-blur-md border-2 border-[#ccd5ae]/20 p-6 rounded-[32px] shadow-sm max-w-md">
+          <h4 className="text-lg font-black mb-4 text-left border-b border-[#ccd5ae]/20 pb-2 text-[#2b271d]">Your Profile</h4>
           <div className="space-y-3 text-sm mb-2">
             <div className="flex justify-between">
-              <span className="text-gray-400">Username:</span>
-              <span className="font-semibold">{user?.username}</span>
+              <span className="text-[#4a4538]">Username:</span>
+              <span className="font-bold text-[#2b271d]">{user?.username}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Email:</span>
-              <span className="text-gray-300">{user?.email}</span>
+              <span className="text-[#4a4538]">Email:</span>
+              <span className="font-semibold text-[#2b271d]">{user?.email}</span>
             </div>
           </div>
         </section>

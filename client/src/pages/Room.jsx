@@ -276,10 +276,10 @@ const Room = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B0A0F] text-white flex justify-center items-center">
+      <div className="min-h-screen bg-[#fefae0] text-[#2b271d] flex justify-center items-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400 text-sm">Loading workspace...</p>
+          <div className="w-12 h-12 border-4 border-[#d4a373] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#4a4538]/70 text-sm font-bold">Loading workspace...</p>
         </div>
       </div>
     );
@@ -287,13 +287,13 @@ const Room = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0B0A0F] text-white flex justify-center items-center">
-        <div className="bg-white/5 border border-white/10 p-8 rounded-2xl max-w-sm text-center">
-          <div className="text-red-400 mb-4 text-xl font-semibold">Access Error</div>
-          <p className="text-gray-300 text-sm mb-6">{error}</p>
+      <div className="min-h-screen bg-[#fefae0] text-[#2b271d] flex justify-center items-center">
+        <div className="bg-[#faedcd]/60 border-2 border-[#ccd5ae]/30 p-8 rounded-[32px] max-w-sm text-center">
+          <div className="text-rose-600 mb-4 text-xl font-bold">Access Error</div>
+          <p className="text-[#4a4538] text-sm mb-6">{error}</p>
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full bg-white/10 hover:bg-white/15 text-white font-semibold py-2 px-4 rounded-xl border border-white/10 transition-all text-sm"
+            className="w-full bg-white/5 hover:bg-white/10 text-[#4a4538] font-bold py-2 px-4 rounded-full border border-[#ccd5ae]/30 transition-all text-sm cursor-pointer"
           >
             Back to Dashboard
           </button>
@@ -303,18 +303,18 @@ const Room = () => {
   }
 
   return (
-    <div className="flex h-[calc(100vh-69px)] bg-[#0B0A0F] text-white overflow-hidden">
+    <div className="flex h-[calc(100vh-100px)] bg-[#fefae0] text-[#2b271d] overflow-hidden p-4">
       {/* Sidebar - Participants */}
-      <aside className="w-72 bg-[#100D1B]/60 border-r border-white/10 flex flex-col justify-between hidden md:flex z-10">
-        <div className="p-6 overflow-y-auto">
+      <aside className="w-72 bg-[#faedcd]/50 border-2 border-[#ccd5ae]/20 flex flex-col justify-between hidden md:flex z-10 rounded-[32px] p-6 shadow-sm mr-4">
+        <div className="overflow-y-auto">
           {/* Room Header Info */}
           <div className="mb-8">
-            <h2 className="text-2xl font-black text-white mb-2 text-left truncate">{room?.roomName}</h2>
-            <div className="flex items-center justify-between bg-white/5 border border-white/10 px-3 py-2 rounded-xl">
-              <span className="text-xs text-gray-400">Code: <strong className="text-violet-400 font-mono">{room?.roomCode}</strong></span>
+            <h2 className="text-2xl font-black text-[#2b271d] mb-2 text-left truncate">{room?.roomName}</h2>
+            <div className="flex items-center justify-between bg-[#fefae0] border border-[#ccd5ae]/40 px-3.5 py-2.5 rounded-2xl">
+              <span className="text-xs text-[#4a4538]">Code: <strong className="text-[#d4a373] font-mono font-bold">{room?.roomCode}</strong></span>
               <button
                 onClick={handleCopyCode}
-                className="text-xs bg-violet-600 hover:bg-violet-500 text-white font-semibold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                className="text-xs bg-gradient-to-r from-[#ccd5ae] to-[#d4a373] text-[#2b271d] font-black px-3 py-1.5 rounded-full transition-colors cursor-pointer"
               >
                 {copied ? 'Copied!' : 'Copy'}
               </button>
@@ -323,19 +323,19 @@ const Room = () => {
 
           {/* Participants List */}
           <div>
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 text-left">
+            <h3 className="text-xs font-bold text-[#4a4538] uppercase tracking-wider mb-4 text-left">
               Active Members ({room?.participants?.length || 0})
             </h3>
             <ul className="space-y-3">
               {room?.participants?.map((participant) => (
                 <li key={participant._id} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-violet-600/10 border border-violet-500/20 text-violet-400 flex items-center justify-center font-bold text-xs uppercase shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-[#ccd5ae]/30 border border-[#ccd5ae]/60 text-[#4a4538] flex items-center justify-center font-bold text-xs uppercase shadow-sm">
                     {participant.username.substring(0, 2)}
                   </div>
-                  <span className="text-sm font-semibold text-gray-300 truncate">
+                  <span className="text-sm font-semibold text-[#4a4538] truncate">
                     {participant.username}
                     {participant._id === room.owner._id && (
-                      <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded-md ml-2 font-medium">Owner</span>
+                      <span className="text-[10px] bg-[#d4a373]/15 text-[#d4a373] border border-[#d4a373]/30 px-2 py-0.5 rounded-full ml-2 font-bold">Owner</span>
                     )}
                   </span>
                 </li>
@@ -344,10 +344,10 @@ const Room = () => {
           </div>
         </div>
 
-        <div className="p-6 border-t border-white/10">
+        <div className="pt-6 border-t border-[#ccd5ae]/20">
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 font-semibold py-3 px-4 rounded-xl text-sm transition-all duration-200 active:scale-95 cursor-pointer"
+            className="w-full bg-white/5 hover:bg-rose-500/10 hover:text-rose-600 border border-[#ccd5ae]/40 text-[#4a4538] font-bold py-3 px-4 rounded-full text-sm transition-all duration-200 active:scale-95 cursor-pointer"
           >
             Leave Workspace
           </button>
@@ -355,17 +355,17 @@ const Room = () => {
       </aside>
 
       {/* Main Chat Panel */}
-      <section className="flex-1 flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#0B0A0F] to-[#120F24]">
+      <section className="flex-1 flex flex-col justify-between overflow-hidden bg-[#faedcd]/20 border-2 border-[#ccd5ae]/20 rounded-[32px] shadow-sm">
         {/* Mobile Header */}
-        <header className="p-4 border-b border-white/10 bg-[#100D1B]/80 backdrop-blur-md flex justify-between items-center md:hidden">
+        <header className="p-4 border-b border-[#ccd5ae]/20 bg-[#faedcd]/90 backdrop-blur-md flex justify-between items-center md:hidden rounded-t-[30px]">
           <div className="truncate pr-4 flex-1">
-            <h2 className="text-sm font-bold truncate text-left">{room?.roomName}</h2>
-            <p className="text-[9px] text-gray-400 text-left font-mono">Code: {room?.roomCode}</p>
+            <h2 className="text-sm font-bold truncate text-left text-[#2b271d]">{room?.roomName}</h2>
+            <p className="text-[9px] text-[#4a4538] text-left font-mono">Code: {room?.roomCode}</p>
           </div>
           <div className="flex gap-1.5 shrink-0">
             <button
               onClick={() => setShowMobileParticipants(true)}
-              className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 font-semibold px-2 py-1.5 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+              className="text-xs bg-white/5 border border-[#ccd5ae]/30 text-[#4a4538] font-bold px-2 py-1.5 rounded-full transition-all flex items-center gap-1 cursor-pointer"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -374,13 +374,13 @@ const Room = () => {
             </button>
             <button
               onClick={handleCopyCode}
-              className="text-xs bg-violet-600 hover:bg-violet-500 text-white font-semibold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
+              className="text-xs bg-gradient-to-r from-[#ccd5ae] to-[#d4a373] text-[#2b271d] font-black px-2.5 py-1.5 rounded-full transition-all cursor-pointer"
             >
               {copied ? 'Copied!' : 'Copy'}
             </button>
             <button
               onClick={() => navigate('/dashboard')}
-              className="text-xs bg-white/5 hover:bg-red-500/10 hover:text-red-400 border border-white/10 text-gray-300 font-semibold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
+              className="text-xs bg-white/5 hover:bg-rose-500/10 hover:text-rose-600 border border-[#ccd5ae]/30 text-[#4a4538] font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer"
             >
               Leave
             </button>
@@ -391,13 +391,13 @@ const Room = () => {
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.length === 0 ? (
             <div className="h-full flex flex-col justify-center items-center text-center px-4">
-              <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 mb-4 text-violet-400 animate-pulse">
+              <div className="w-16 h-16 bg-[#faedcd] rounded-full flex items-center justify-center border border-[#ccd5ae]/40 mb-4 text-[#d4a373]">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </div>
-              <h4 className="text-lg font-bold text-white mb-1">No Messages Yet</h4>
-              <p className="text-gray-400 text-sm max-w-xs leading-relaxed">
+              <h4 className="text-lg font-black text-[#2b271d] mb-1">No Messages Yet</h4>
+              <p className="text-[#4a4538]/70 text-sm max-w-xs leading-relaxed">
                 Be the first to send a message in this workspace chat room!
               </p>
             </div>
@@ -407,7 +407,7 @@ const Room = () => {
               if (message.system) {
                 return (
                   <div key={message._id} className="flex justify-center my-2">
-                    <span className="bg-white/5 border border-white/5 text-gray-400 text-[11px] font-semibold px-3 py-1 rounded-full tracking-wide">
+                    <span className="bg-[#faedcd]/60 border border-[#ccd5ae]/30 text-[#4a4538] text-[11px] font-bold px-4 py-1.5 rounded-full tracking-wide">
                       {message.content}
                     </span>
                   </div>
@@ -429,24 +429,24 @@ const Room = () => {
                   <div className={`max-w-[70%] ${isOwnMessage ? 'text-right' : 'text-left'}`}>
                     {/* Sender username */}
                     {!isOwnMessage && (
-                      <span className="text-xs text-gray-400 font-semibold block mb-1 ml-1">
+                      <span className="text-xs text-[#4a4538] font-bold block mb-1 ml-1">
                         {message.sender.username}
                       </span>
                     )}
 
                     {/* Chat Bubble */}
                     <div
-                      className={`px-4 py-3 rounded-2xl text-sm leading-relaxed inline-block shadow-md ${
+                      className={`px-5 py-3.5 rounded-[24px] text-sm leading-relaxed inline-block shadow-sm ${
                         isOwnMessage
-                          ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-br-none'
-                          : 'bg-[#151221] border border-white/5 text-gray-200 rounded-bl-none'
+                          ? 'bg-gradient-to-r from-[#ccd5ae] to-[#d4a373] text-[#2b271d] font-semibold rounded-tr-none'
+                          : 'bg-[#faedcd]/85 border-2 border-[#ccd5ae]/15 text-[#2b271d] rounded-tl-none'
                       }`}
                     >
                       <p className="whitespace-pre-wrap">{message.content}</p>
                     </div>
 
                     {/* Timestamp */}
-                    <span className="text-[9px] text-gray-500 block mt-1 px-1">
+                    <span className="text-[9px] text-[#4a4538]/60 block mt-1 px-1">
                       {formattedTime}
                     </span>
                   </div>
@@ -457,11 +457,11 @@ const Room = () => {
 
           {/* Typing Indicator */}
           {Object.keys(typingUsers).length > 0 && (
-            <div className="flex items-center gap-2 text-xs text-gray-400 italic bg-[#151221]/50 border border-white/5 px-3 py-1.5 rounded-full w-fit animate-pulse my-2">
+            <div className="flex items-center gap-2 text-xs text-[#4a4538] italic bg-[#faedcd]/50 border border-[#ccd5ae]/30 px-4 py-2 rounded-full w-fit animate-pulse my-2">
               <div className="flex gap-1 shrink-0">
-                <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-[#d4a373] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-[#d4a373] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-[#d4a373] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
               </div>
               <span>{getTypingText()}</span>
             </div>
@@ -471,19 +471,19 @@ const Room = () => {
         </div>
 
         {/* Chat Footer Input */}
-        <footer className="p-6 border-t border-white/10 bg-[#0B0A0F]/65 backdrop-blur-md">
+        <footer className="p-4 border-t border-[#ccd5ae]/20 bg-[#faedcd]/10">
           <form onSubmit={handleSendMessage} className="flex gap-3">
             <input
               type="text"
               placeholder="Type a message..."
               value={newMessage}
               onChange={handleInputChange}
-              className="flex-1 bg-[#13111A] text-white placeholder-gray-500 border border-white/10 px-5 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all duration-200"
+              className="flex-1 bg-[#fefae0] text-[#2b271d] placeholder-[#4a4538]/50 border-2 border-[#ccd5ae]/50 px-5 py-3.5 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#d4a373]/30 focus:border-[#d4a373] transition-all duration-205"
             />
             <button
               type="submit"
               disabled={!newMessage.trim()}
-              className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-40 disabled:pointer-events-none text-white font-semibold text-sm px-6 py-3.5 rounded-xl shadow-md transition-all duration-200 active:scale-95 cursor-pointer"
+              className="bg-gradient-to-r from-[#ccd5ae] to-[#d4a373] hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none text-[#2b271d] font-black text-sm px-8 py-3.5 rounded-full shadow-sm shadow-[#d4a373]/10 transition-all duration-200 active:scale-95 cursor-pointer"
             >
               Send
             </button>
@@ -493,11 +493,11 @@ const Room = () => {
 
       {/* Mobile Participants Overlay Drawer */}
       {showMobileParticipants && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden flex justify-end">
-          <div className="w-72 bg-[#100D1B] h-full p-6 flex flex-col justify-between border-l border-white/10 shadow-2xl transition-all duration-300">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 md:hidden flex justify-end">
+          <div className="w-72 bg-[#fefae0] h-full p-6 flex flex-col justify-between border-l-2 border-[#ccd5ae]/30 shadow-2xl rounded-l-[32px] transition-all duration-300">
             <div>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-white">Room Details</h3>
+                <h3 className="text-lg font-bold text-[#2b271d]">Room Details</h3>
                 <button
                   onClick={() => setShowMobileParticipants(false)}
                   className="text-gray-400 hover:text-white p-1 cursor-pointer"
@@ -510,12 +510,12 @@ const Room = () => {
 
               {/* Room Header Info */}
               <div className="mb-8 font-sans">
-                <h4 className="text-xl font-black text-white mb-2 text-left truncate">{room?.roomName}</h4>
-                <div className="flex items-center justify-between bg-white/5 border border-white/10 px-3 py-2 rounded-xl">
-                  <span className="text-xs text-gray-400">Code: <strong className="text-violet-400 font-mono">{room?.roomCode}</strong></span>
+                <h4 className="text-xl font-black text-[#2b271d] mb-2 text-left truncate">{room?.roomName}</h4>
+                <div className="flex items-center justify-between bg-[#faedcd]/60 border border-[#ccd5ae]/40 px-3.5 py-2.5 rounded-2xl">
+                  <span className="text-xs text-[#4a4538]">Code: <strong className="text-[#d4a373] font-mono font-bold">{room?.roomCode}</strong></span>
                   <button
                     onClick={handleCopyCode}
-                    className="text-xs bg-violet-600 hover:bg-violet-500 text-white font-semibold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                    className="text-xs bg-gradient-to-r from-[#ccd5ae] to-[#d4a373] text-[#2b271d] font-black px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                   >
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
@@ -524,19 +524,19 @@ const Room = () => {
 
               {/* Participants List */}
               <div className="font-sans">
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 text-left">
+                <h3 className="text-xs font-bold text-[#4a4538] uppercase tracking-wider mb-4 text-left">
                   Active Members ({room?.participants?.length || 0})
                 </h3>
                 <ul className="space-y-3 overflow-y-auto max-h-[50vh]">
                   {room?.participants?.map((participant) => (
                     <li key={participant._id} className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-violet-600/10 border border-violet-500/20 text-violet-400 flex items-center justify-center font-bold text-xs uppercase shadow-sm">
+                      <div className="w-8 h-8 rounded-full bg-[#ccd5ae]/30 border border-[#ccd5ae]/60 text-[#4a4538] flex items-center justify-center font-bold text-xs uppercase shadow-sm">
                         {participant.username.substring(0, 2)}
                       </div>
-                      <span className="text-sm font-semibold text-gray-300 truncate">
+                      <span className="text-sm font-semibold text-[#4a4538] truncate">
                         {participant.username}
                         {participant._id === room.owner._id && (
-                          <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded-md ml-2 font-medium">Owner</span>
+                          <span className="text-[10px] bg-[#d4a373]/15 text-[#d4a373] border border-[#d4a373]/30 px-2 py-0.5 rounded-full ml-2 font-bold">Owner</span>
                         )}
                       </span>
                     </li>
@@ -545,13 +545,13 @@ const Room = () => {
               </div>
             </div>
 
-            <div className="border-t border-white/10 pt-4">
+            <div className="border-t border-[#ccd5ae]/20 pt-4">
               <button
                 onClick={() => {
                   setShowMobileParticipants(false);
                   navigate('/dashboard');
                 }}
-                className="w-full bg-white/5 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 text-gray-300 border border-white/10 font-semibold py-3 px-4 rounded-xl text-sm transition-all duration-200 active:scale-95 cursor-pointer"
+                className="w-full bg-white/5 hover:bg-rose-500/10 hover:text-rose-600 hover:border-rose-500/20 text-[#2b271d] border border-[#ccd5ae]/40 font-bold py-3 px-4 rounded-full text-sm transition-all duration-200 active:scale-95 cursor-pointer"
               >
                 Leave Workspace
               </button>
