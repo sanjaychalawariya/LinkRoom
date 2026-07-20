@@ -97,7 +97,7 @@ const Signup = () => {
               name="username"
               value={username}
               onChange={handleChange}
-              placeholder="johndoe"
+              placeholder="username"
               className="w-full bg-[#fefae0] text-[#2b271d] placeholder-[#4a4538]/50 border-2 border-[#ccd5ae]/40 px-5 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-[#d4a373]/30 focus:border-[#d4a373] transition-all duration-200"
               required
             />
@@ -112,7 +112,7 @@ const Signup = () => {
               name="email"
               value={email}
               onChange={handleChange}
-              placeholder="john@example.com"
+              placeholder="email@gmail.com"
               className="w-full bg-[#fefae0] text-[#2b271d] placeholder-[#4a4538]/50 border-2 border-[#ccd5ae]/40 px-5 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-[#d4a373]/30 focus:border-[#d4a373] transition-all duration-200"
               required
             />
